@@ -1,0 +1,22 @@
+# First create .gitignore file
+echo "# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+.env.local
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Distribution
+dist/
+build/
+*.egg-info/" > .gitignore
+
+# Git commands
+git init
+git add .
+git commit -m "Initial commit"
