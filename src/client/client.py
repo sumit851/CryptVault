@@ -10,41 +10,41 @@ class FileShareClient:
         self.send_dir = os.path.join(self.script_dir, 'files_to_send')
         self.download_dir = os.path.join(self.script_dir, 'downloads')
 
-        # Create necessary directories
+       
         os.makedirs(self.send_dir, exist_ok=True)
         os.makedirs(self.download_dir, exist_ok=True)
 
     def send_file(self, filename):
-        # Construct full file path
+        
         filepath = os.path.join(self.send_dir, filename)
         
-        # Validate file exists
+       
         if not os.path.exists(filepath):
             print(f"[!] File {filename} not found")
             return False
         
-        # Get file size
+       
         filesize = os.path.getsize(filepath)
         
-        # Create client socket
+       
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client_socket.connect((self.host, self.port))
         
         try:
-            # Send operation type (upload)
-            client_socket.send(b'UPLOAD')
-            time.sleep(0.1)  # Small delay to ensure server processes
             
-            # Send filename with fixed-length padding
+            client_socket.send(b'UPLOAD')
+            time.sleep(0.1)  
+            
+           
             filename_bytes = filename.encode('utf-8')
             filename_length = len(filename_bytes)
             client_socket.send(f"{filename_length:10}".encode('utf-8'))
             client_socket.send(filename_bytes)
             
-            # Send filesize with fixed-length padding
+            
             client_socket.send(f"{filesize:20}".encode('utf-8'))
             
-            # Send file contents
+           
             with open(filepath, 'rb') as f:
                 while True:
                     data = f.read(1024)
@@ -63,33 +63,33 @@ class FileShareClient:
             client_socket.close()
 
     def download_file(self, filename):
-        # Create client socket
+       
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client_socket.connect((self.host, self.port))
         
         try:
-            # Send operation type (download)
+          
             client_socket.send(b'DOWNLOAD')
-            time.sleep(0.1)  # Small delay to ensure server processes
+            time.sleep(0.1)  
             
-            # Send filename with fixed-length padding
+            
             filename_bytes = filename.encode('utf-8')
             filename_length = len(filename_bytes)
             client_socket.send(f"{filename_length:10}".encode('utf-8'))
             client_socket.send(filename_bytes)
             
-            # Receive filesize
+            
             filesize_bytes = client_socket.recv(20).decode('utf-8').strip()
             filesize = int(filesize_bytes)
             
-            # Prepare to receive file
+           
             filepath = os.path.join(self.download_dir, filename)
             
-            # Receive file
+           
             with open(filepath, 'wb') as f:
                 bytes_received = 0
                 while bytes_received < filesize:
-                    # Calculate remaining bytes
+
                     remaining = filesize - bytes_received
                     chunk_size = min(1024, remaining)
                     
@@ -120,7 +120,7 @@ class FileShareClient:
         choice = input("Enter your choice (1/2): ").strip()
         
         if choice == '1':
-            # List uploadable files
+           
             available_files = os.listdir(self.send_dir)
             if not available_files:
                 print("[!] No files found in files_to_send directory")
